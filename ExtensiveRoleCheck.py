@@ -43,18 +43,20 @@ class ExtensiveRolesChecker(object):
     def _generate(self):
         for entity in self._json_file['items']:
             role_name = entity['metadata']['name']
-            for rule in entity['rules']:
-                if not rule.get('resources', None):
-                    continue
-                self.get_read_secrets(rule, role_name)
-                self.clusteradmin_role(rule, role_name)
-                self.any_resources(rule, role_name)
-                self.any_verb(rule, role_name)
-                self.high_risk_roles(rule, role_name)
-                self.role_and_roleBindings(rule, role_name)
-                self.create_pods(rule, role_name)
-                self.pods_exec(rule, role_name)
-                self.pods_attach(rule, role_name)
+            # https://github.com/cyberark/kubernetes-rbac-audit/pull/5/files#r785002351
+            if entity['rules']:
+                for rule in entity['rules']:
+                    if not rule.get('resources', None):
+                        continue
+                    self.get_read_secrets(rule, role_name)
+                    self.clusteradmin_role(rule, role_name)
+                    self.any_resources(rule, role_name)
+                    self.any_verb(rule, role_name)
+                    self.high_risk_roles(rule, role_name)
+                    self.role_and_roleBindings(rule, role_name)
+                    self.create_pods(rule, role_name)
+                    self.pods_exec(rule, role_name)
+                    self.pods_attach(rule, role_name)
 
     #Read cluster secrets:
     def get_read_secrets(self, rule, role_name):
